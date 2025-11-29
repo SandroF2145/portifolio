@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Portfolio — Index</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #0a0a0a;
+      --text: #fff;
+      --gap: .75rem;
+      --section-vertical-padding: 1.5rem;
+      --card-radius: .5rem;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;padding:0;font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text)}
+    .main-image{aspect-ratio:4/3;border-radius:var(--card-radius);overflow:hidden}
+    .gallery-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gap)}
+    .gallery-item{overflow:hidden;transition:transform .5s ease, box-shadow .5s ease;cursor:pointer;position:relative;border-radius:var(--card-radius)}
+    .gallery-item:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(0,0,0,.5)}
+    .wide-panoramic{grid-column:span 12;aspect-ratio:21/9}
+    .portrait-9-16{grid-column:span 3;aspect-ratio:9/16}
+    .portrait-3-4{grid-column:span 3;aspect-ratio:3/4}
+    .carousel-container{position:relative;width:100%;height:100%;overflow:hidden}
+    .carousel-slide{position:absolute;top:0;left:0;width:100%;height:100%;background-size:cover;background-position:center;opacity:0;transform:scale(1.03);transition:opacity 1.2s ease, transform 1.2s ease;pointer-events:none;z-index:1}
+    .carousel-slide.active{opacity:1;transform:scale(1);pointer-events:auto;z-index:2}
+    .carousel-indicator{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.6);color:#fff;padding:6px 10px;border-radius:8px;font-size:12px;pointer-events:none}
+    .video-play-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;background:rgba(255,255,255,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;pointer-events:none}
+    .video-play-icon::after{content:'';width:0;height:0;border-left:20px solid #000;border-top:12px solid transparent;border-bottom:12px solid transparent;margin-left:4px}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:9999;align-items:center;justify-content:center;padding:1.5rem}
+    .modal-overlay.active{display:flex}
+    .modal-content{max-width:95vw;max-height:95vh;position:relative;display:flex;align-items:center;justify-content:center}
+    .modal-image{max-height:90vh;max-width:90vw;height:auto;width:auto;object-fit:contain;border-radius:6px;box-shadow:0 12px 30px rgba(0,0,0,.6)}
+    .modal-close{position:absolute;top:14px;right:14px;width:44px;height:44px;background:rgba(255,255,255,.12);border:none;border-radius:50%;color:#fff;font-size:22px;cursor:pointer;z-index:10001}
+    .modal-nav{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;background:rgba(255,255,255,.08);border:none;border-radius:50%;color:#fff;font-size:26px;cursor:pointer;z-index:10001}
+    .modal-nav.prev{left:18px}.modal-nav.next{right:18px}
+    .modal-counter{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.6);color:#fff;padding:8px 14px;border-radius:20px;font-size:13px}
+    .project-2-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap)}
+    .gallery-column{display:flex;flex-direction:column;gap:var(--gap)}
+    .gallery-pair-top{width:100%;aspect-ratio:1250/1400;border-radius:var(--card-radius);overflow:hidden;background-size:cover;background-position:center}
+    .gallery-pair-bottom-1{width:100%;aspect-ratio:1400/680;border-radius:var(--card-radius);overflow:hidden;background-size:cover;background-position:center}
+    .gallery-pair-bottom-2{width:100%;aspect-ratio:1400/460;border-radius:var(--card-radius);overflow:hidden;background-size:cover;background-position:center}
+    .gallery-pair-bottom-3{width:100%;aspect-ratio:1400/485;border-radius:var(--card-radius);overflow:hidden;background-size:cover;background-position:center}
+    section{padding:var(--section-vertical-padding) 1.5rem}
+    .max-w-7xl{max-width:1120px;margin:0 auto}
+    .mb-12{margin-bottom:1.5rem}
+    .space-y-6>*+*{margin-top:1rem}
+    .btn-spacing{margin-top:1.5rem!important}
+    @media (max-width:1024px){:root{--section-vertical-padding:1.2rem} h2{font-size:clamp(28px,5vw,40px)}}
+    @media (max-width:768px){.gallery-grid{grid-template-columns:repeat(4,1fr)}.wide-panoramic{grid-column:span 4}.portrait-9-16{grid-column:span 2}.portrait-3-4{grid-column:span 2}.project-2-gallery{grid-template-columns:1fr}.modal-image{max-width:95vw;max-height:calc(95vh - 80px)}}
+  </style>
+</head>
+<body>
+  <div id="app" class="w-full"></div>
+
+  <script>
+    const defaultConfig = {
+      background_color: "#0a0a0a",
+      surface_color: "#1a1a1a",
+      text_color: "#ffffff",
+      primary_action_color: "#6366f1",
+      secondary_action_color: "#8b5cf6",
+      font_family: "Inter",
+      font_size: 16,
+      project_1_title: "Camisa 12 Store",
+      project_1_description: "Comecei na Camisa 12 Store cuidando das redes sociais e do atendimento aos clientes no dia a dia, além das tarefas administrativas como emissão de notas e contato com fornecedores. Após um período, fui designado para renovar da identidade visual da marca, contribuindo para uma comunicação mais moderna e alinhada ao posicionamento da loja. Permanecei na equipe até o encerramento das atividades da loja, em função de mudanças internas na gestão, o que levou ao arquivamento dos perfis oficiais.",
+      project_2_title: "Centro Educacional Mais Educar",
+      project_2_description: "Fui contratado pelo Centro Educacional Mais Educar para criar o design de modelos de camiseta do cursinho pré-vestibular. Desenvolvi três propostas distintas, representando as áreas de Exatas, Ciências da Natureza e Humanas, com a proposta de trazer o máximo de elementos possíveis que remetam as áreas de estudo usando como ferramenta a plataforma do Figma.",
+      project_3_title: "Casanova Loja Agropecuária e Western",
+      project_3_description: "Neste cargo, sou responsável pelo planejamento, criação e execução de estratégias de marketing digital da empresa, com foco principal no Instagram, atuando desde o desenvolvimento da ideia criativa até a produção e publicação das postagens e atendimento ao público por meio das redes sociais, fortalecendo o relacionamento com os clientes e contribuindo para o posicionamento da loja no ambiente digital."
+    };
+
+    let currentGalleryId = '';
+    let currentModalIndex = 0;
+    let galleryItems = [];
+    let carouselIntervals = {};
+
+    function clearAllCarouselIntervals() {
+      Object.keys(carouselIntervals).forEach(k => {
+        try { clearInterval(carouselIntervals[k]); } catch (e) {}
+      });
+      carouselIntervals = {};
+    }
+
+    function extractUrlFromCss(bg) {
+      if (!bg) return null;
+      const m = bg.match(/url\((?:'|"|)?(.+?)(?:'|"|)?\)/);
+      return m ? m[1] : null;
+    }
+
+    function getFullSrcFromItem(item, slideEl = null) {
+      if (slideEl && slideEl.dataset && slideEl.dataset.full) return slideEl.dataset.full;
+      if (item.dataset && item.dataset.full) return item.dataset.full;
+      const innerWithFull = item.querySelector('[data-full]');
+      if (innerWithFull && innerWithFull.dataset.full) return innerWithFull.dataset.full;
+      if (slideEl && slideEl.style && slideEl.style.backgroundImage) {
+        const u = extractUrlFromCss(slideEl.style.backgroundImage);
+        if (u) return u;
+      }
+      const firstDiv = item.querySelector('div');
+      if (firstDiv && firstDiv.style && firstDiv.style.backgroundImage) {
+        const u = extractUrlFromCss(firstDiv.style.backgroundImage);
+        if (u) return u;
+      }
+      return '';
+    }
+
+    async function onConfigChange(config) {
+      clearAllCarouselIntervals();
+      const app = document.getElementById('app');
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseFontStack = 'system-ui, -apple-system, sans-serif';
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const backgroundColor = config.background_color || defaultConfig.background_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action_color || defaultConfig.primary_action_color;
+      const secondaryColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+      app.style.backgroundColor = backgroundColor;
+      app.style.color = textColor;
+      app.style.fontFamily = `${customFont}, ${baseFontStack}`;
+
+      const project1Title = config.project_1_title || defaultConfig.project_1_title;
+      const project1Description = config.project_1_description || defaultConfig.project_1_description;
+      const project2Title = config.project_2_title || defaultConfig.project_2_title;
+      const project2Description = config.project_2_description || defaultConfig.project_2_description;
+      const project3Title = config.project_3_title || defaultConfig.project_3_title;
+      const project3Description = config.project_3_description || defaultConfig.project_3_description;
+
+      app.innerHTML = `
+        <section class="w-full px-8 py-16" style="background-color:${backgroundColor};padding: 32px;">
+          <div class="max-w-7xl mx-auto">
+            <div class="mb-12">
+              <div class="space-y-6" style="margin-bottom: 32px;">
+                <span class="inline-block px-4 py-2 rounded-full text-sm font-semibold" style="background-color:#9d0505;color:${textColor};font-size:${baseSize * 0.875}px">Jun 2025 - Atualmente</span>
+                <h2 class="font-bold" style="font-size:60px;color:${textColor};margin-bottom:8px">${project3Title}</h2>
+                <p class="leading-relaxed" style="font-size:${baseSize * 1.125}px;color:${textColor};opacity:0.9;margin-top:8px">${project3Description}</p>
+                <a href="https://www.instagram.com/casanova.agropecuaria/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold btn-spacing" style="background-color:#9d0505;color:${textColor};font-size:${baseSize * 0.875}px;text-decoration:none">casanova.agropecuaria</a>
+              </div>
+
+            <div class="gallery-grid" id="gallery1">
+              <div class="gallery-item wide-panoramic" data-index="0" data-type="image" data-full="assets/images/banner.s1.png">
+                <div style="background-image:url('assets/images/banner.s1.png');background-size:cover;background-position:center;width:100%;height:100%"></div>
+              </div>
+
+              <div class="gallery-item portrait-9-16" data-index="1" data-type="image" data-full="assets/images/1.s1.png">
+                <div style="background-image:url('assets/images/1.s1.png');background-size:cover;background-position:center;width:100%;height:100%"></div>
+              </div>
+
+              <div class="gallery-item portrait-9-16" data-index="2" data-type="carousel" data-carousel-size="4">
+                <div class="carousel-container">
+                  <div class="carousel-slide active" data-full="assets/images/2,1.s1.png" style="background-image:url('assets/images/2,1.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/2,2.s1.png" style="background-image:url('assets/images/2,2.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/2,3.s1.png" style="background-image:url('assets/images/2,3.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/2,4.s1.png" style="background-image:url('assets/images/2,4.s1.png')"></div>
+                  <div class="carousel-indicator">1/4</div>
+                </div>
+              </div>
+
+              <div class="gallery-item portrait-9-16" data-index="6" data-type="carousel" data-carousel-size="8">
+                <div class="carousel-container">
+                  <div class="carousel-slide active" data-full="assets/images/3,1.s1.png" style="background-image:url('assets/images/3,1.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/3,2.s1.png" style="background-image:url('assets/images/3,2.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/3,3.s1.png" style="background-image:url('assets/images/3,3.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/3,4.s1.png" style="background-image:url('assets/images/3,4.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/3,5.s1.png" style="background-image:url('assets/images/3,5.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/3,6.s1.png" style="background-image:url('assets/images/3,6.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/3,7.s1.png" style="background-image:url('assets/images/3,7.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/3,8.s1.png" style="background-image:url('assets/images/3,8.s1.png')"></div>
+                  <div class="carousel-indicator">1/8</div>
+                </div>
+              </div>
+
+              <div class="gallery-item portrait-9-16" data-index="14" data-type="carousel" data-carousel-size="5">
+                <div class="carousel-container">
+                  <div class="carousel-slide active" data-full="assets/images/4,1.s1.png" style="background-image:url('assets/images/4,1.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/4,2.s1.png" style="background-image:url('assets/images/4,2.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/4,3.s1.png" style="background-image:url('assets/images/4,3.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/4,4.s1.png" style="background-image:url('assets/images/4,4.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/4,5.s1.png" style="background-image:url('assets/images/4,5.s1.png')"></div>
+                  <div class="carousel-indicator">1/5</div>
+                </div>
+              </div>
+
+              <div class="gallery-item portrait-9-16" data-index="19" data-type="carousel" data-carousel-size="10">
+                <div class="carousel-container">
+                  <div class="carousel-slide active" data-full="assets/images/5,01.s1.png" style="background-image:url('assets/images/5,01.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/5,02.s1.png" style="background-image:url('assets/images/5,02.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/5,03.s1.png" style="background-image:url('assets/images/5,03.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/5,04.s1.png" style="background-image:url('assets/images/5,04.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/5,05.s1.png" style="background-image:url('assets/images/5,05.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/5,06.s1.png" style="background-image:url('assets/images/5,06.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/5,07.s1.png" style="background-image:url('assets/images/5,07.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/5,08.s1.png" style="background-image:url('assets/images/5,08.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/5,09.s1.png" style="background-image:url('assets/images/5,09.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/5,10.s1.png" style="background-image:url('assets/images/5,10.s1.png')"></div>
+                  <div class="carousel-indicator">1/10</div>
+                </div>
+              </div>
+
+              <div class="gallery-item portrait-9-16" data-index="29" data-type="carousel" data-carousel-size="3">
+                <div class="carousel-container">
+                  <div class="carousel-slide active" data-full="assets/images/6,1.s1.png" style="background-image:url('assets/images/6,1.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/6,2.s1.png" style="background-image:url('assets/images/6,2.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/6,3.s1.png" style="background-image:url('assets/images/6,3.s1.png')"></div>
+                  <div class="carousel-indicator">1/3</div>
+                </div>
+              </div>
+
+              <div class="gallery-item portrait-9-16" data-index="32" data-type="carousel" data-carousel-size="2">
+                <div class="carousel-container">
+                  <div class="carousel-slide active" data-full="assets/images/7,1.s1.png" style="background-image:url('assets/images/7,1.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/7,2.s1.png" style="background-image:url('assets/images/7,2.s1.png')"></div>
+                  <div class="carousel-indicator">1/2</div>
+                </div>
+              </div>
+
+              <div class="gallery-item portrait-9-16" data-index="34" data-type="carousel" data-carousel-size="6">
+                <div class="carousel-container">
+                  <div class="carousel-slide active" data-full="assets/images/8,1.s1.png" style="background-image:url('assets/images/8,1.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/8,2.s1.png" style="background-image:url('assets/images/8,2.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/8,3.s1.png" style="background-image:url('assets/images/8,3.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/8,4.s1.png" style="background-image:url('assets/images/8,4.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/8,5.s1.png" style="background-image:url('assets/images/8,5.s1.png')"></div>
+                  <div class="carousel-slide" data-full="assets/images/8,6.s1.png" style="background-image:url('assets/images/8,6.s1.png')"></div>
+                  <div class="carousel-indicator">1/6</div>
+                </div>
+              </div>
+
+            </div>
+            <div class="modal-overlay" id="modal1">
+              <button class="modal-close" id="modalClose1">×</button>
+              <button class="modal-nav prev" id="modalPrev1">‹</button>
+              <button class="modal-nav next" id="modalNext1">›</button>
+              <div class="modal-content" id="modalContent1"></div>
+              <div class="modal-counter" id="modalCounter1"></div>
+            </div>
+
+          </div>
+        </section>
+
+        <section class="w-full px-8 py-16" style="background-color:${backgroundColor};padding: 32px;" >
+          <div class="max-w-7xl mx-auto">
+            <div class="mb-12">
+              <div class="space-y-6" style="margin-bottom: 32px;">
+                <span class="inline-block px-4 py-2 rounded-full text-sm font-semibold" style="background-color:#252952;color:${textColor};font-size:${baseSize * 0.875}px">Mar 2025 - Abr 2025</span>
+                <h2 class="font-bold" style="font-size:60px;color:${textColor};margin-bottom:8px">${project2Title}</h2>
+                <p class="leading-relaxed" style="font-size:${baseSize * 1.125}px;color:${textColor};opacity:0.9;margin-top:8px">${project2Description}</p>
+                <a href="https://www.instagram.com/ceduc.maiseducar/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold btn-spacing" style="background-color:#252952;color:${textColor};font-size:${baseSize * 0.875}px;text-decoration:none">ceduc.maiseducar</a>
+              </div>
+
+              <div class="gallery-grid" style="margin-bottom:1rem">
+                <div class="gallery-item wide-panoramic" data-type="image" data-full="assets/images/banner.s2.png">
+                  <div style="background-image:url('assets/images/banner.s2.png');background-size:cover;background-position:center;width:100%;height:100%"></div>
+                </div>
+              </div>
+
+              <div class="project-2-gallery" id="gallery2">
+                <div class="gallery-column">
+                  <div class="gallery-item gallery-pair-top" data-type="image" data-full="assets/images/1.s2.png" style="background-image:url('assets/images/1.s2.png')"></div>
+                  <div class="gallery-item gallery-pair-bottom-1" data-type="image" data-full="assets/images/1,5.s2.png" style="background-image:url('assets/images/1,5.s2.png')"></div>
+                </div>
+                <div class="gallery-column">
+                  <div class="gallery-item gallery-pair-top" data-type="image" data-full="assets/images/2.s2.png" style="background-image:url('assets/images/2.s2.png')"></div>
+                  <div class="gallery-item gallery-pair-bottom-2" data-type="image" data-full="assets/images/2,5.s2.png" style="background-image:url('assets/images/2,5.s2.png')"></div>
+                </div>
+                <div class="gallery-column">
+                  <div class="gallery-item gallery-pair-top" data-type="image" data-full="assets/images/3.s2.png" style="background-image:url('assets/images/3.s2.png')"></div>
+                  <div class="gallery-item gallery-pair-bottom-3" data-type="image" data-full="assets/images/3,5.s2.png" style="background-image:url('assets/images/3,5.s2.png')"></div>
+                </div>
+              </div>
+
+              <div class="modal-overlay" id="modal2">
+                <button class="modal-close" id="modalClose2">×</button>
+                <button class="modal-nav prev" id="modalPrev2">‹</button>
+                <button class="modal-nav next" id="modalNext2">›</button>
+                <div class="modal-content" id="modalContent2"></div>
+                <div class="modal-counter" id="modalCounter2"></div>
+              </div>
+
+          </div>
+        </section>
+
+        <section class="w-full px-8 py-16" style="background-color:${backgroundColor};padding: 32px;">
+          <div class="max-w-7xl mx-auto">
+            <div class="mb-12">
+              <div class="space-y-6" style="margin-bottom: 32px;">
+                <span class="inline-block px-4 py-2 rounded-full text-sm font-semibold" style="background-color:#005ed2;color:${textColor};font-size:${baseSize * 0.875}px">Out 2022 - Jan 2025</span>
+                <h2 class="font-bold" style="font-size:60px;color:${textColor};margin-bottom:8px">${project1Title}</h2>
+                <p class="leading-relaxed" style="font-size:${baseSize * 1.125}px;color:${textColor};opacity:0.9;margin-top:8px">${project1Description}</p>
+                <button class="px-6 py-3 rounded-lg font-semibold muted-button btn-spacing" style="background-color:#6b7280;color:${textColor};font-size:${baseSize * 0.875}px;cursor:not-allowed;opacity:0.7">Instagram e Site Indisponíveis</button>
+              </div>
+
+              <div class="gallery-grid" id="gallery3">
+                <div class="gallery-item wide-panoramic" data-index="0" data-type="image" data-full="assets/images/banner.s3.png">
+                  <div style="background-image:url('assets/images/banner.s3.png');background-size:cover;background-position:center;width:100%;height:100%"></div>
+                </div>
+
+                <div class="gallery-item portrait-9-16" data-index="1" data-type="carousel" data-carousel-size="5">
+                  <div class="carousel-container">
+                    <div class="carousel-slide active" data-full="assets/images/1,1.s3.png" style="background-image:url('assets/images/1,1.s3.png')"></div>
+                    <div class="carousel-slide" data-full="assets/images/1,2.s3.png" style="background-image:url('assets/images/1,2.s3.png')"></div>
+                    <div class="carousel-slide" data-full="assets/images/1,3.s3.png" style="background-image:url('assets/images/1,3.s3.png')"></div>
+                    <div class="carousel-slide" data-full="assets/images/1,4.s3.png" style="background-image:url('assets/images/1,4.s3.png')"></div>
+                    <div class="carousel-slide" data-full="assets/images/1,5.s3.png" style="background-image:url('assets/images/1,5.s3.png')"></div>
+                    <div class="carousel-indicator">1/5</div>
+                  </div>
+                </div>
+
+                <div class="gallery-item portrait-9-16" data-index="6" data-type="carousel" data-carousel-size="4">
+                  <div class="carousel-container">
+                    <div class="carousel-slide active" data-full="assets/images/2,1.s3.png" style="background-image:url('assets/images/2,1.s3.png')"></div>
+                    <div class="carousel-slide" data-full="assets/images/2,2.s3.png" style="background-image:url('assets/images/2,2.s3.png')"></div>
+                    <div class="carousel-slide" data-full="assets/images/2,3.s3.png" style="background-image:url('assets/images/2,3.s3.png')"></div>
+                    <div class="carousel-slide" data-full="assets/images/2,4.s3.png" style="background-image:url('assets/images/2,4.s3.png')"></div>
+                    <div class="carousel-indicator">1/4</div>
+                  </div>
+                </div>
+
+                <div class="gallery-item portrait-9-16" data-index="11" data-type="carousel" data-carousel-size="10">
+                  <div class="carousel-container">
+                    <div class="carousel-slide active" data-full="assets/images/3,01.s3.png" style="background-image:url('assets/images/3,01.s3.png')"></div>
+                    <div class="carousel-slide" data-full="assets/images/3,02.s3.png" style="background-image:url('assets/images/3,02.s3.png')"></div>
+                    <div class="carousel-slide" data-full="assets/images/3,03.s3.png" style="background-image:url('assets/images/3,03.s3.png')"></div>
+                    <div class="carousel-slide" data-full="assets/images/3,04.s3.png" style="background-image:url('assets/images/3,04.s3.png')"></div>
+                    <div class="carousel-slide" data-full="assets/images/3,05.s3.png" style="background-image:url('assets/images/3,05.s3.png')"></div>
+                    <div class="carousel-slide" data-full="assets/images/3,06.s3.png" style="background-image:url('assets/images/3,06.s3.png')"></div>
+                    <div class="carousel-slide" data-full="assets/images/3,07.s3.png" style="background-image:url('assets/images/3,07.s3.png')"></div>
+                    <div class="carousel-slide" data-full="assets/images/3,08.s3.png" style="background-image:url('assets/images/3,08.s3.png')"></div>
+                    <div class="carousel-slide" data-full="assets/images/3,09.s3.png" style="background-image:url('assets/images/3,09.s3.png')"></div>
+                    <div class="carousel-slide" data-full="assets/images/3,10.s3.png" style="background-image:url('assets/images/3,10.s3.png')"></div>
+                    <div class="carousel-indicator">1/10</div>
+                  </div>
+                </div>
+
+                <div class="gallery-item portrait-9-16" data-index="21" data-type="carousel" data-carousel-size="10">
+                  <div class="carousel-container">
+                    <div class="carousel-slide active" data-full="assets/images/4,01.s3.jpeg" style="background-image:url('assets/images/4,01.s3.jpeg')"></div>
+                    <div class="carousel-slide" data-full="assets/images/4,02.s3.jpeg" style="background-image:url('assets/images/4,02.s3.jpeg')"></div>
+                    <div class="carousel-slide" data-full="assets/images/4,03.s3.jpeg" style="background-image:url('assets/images/4,03.s3.jpeg')"></div>
+                    <div class="carousel-slide" data-full="assets/images/4,04.s3.jpeg" style="background-image:url('assets/images/4,04.s3.jpeg')"></div>
+                    <div class="carousel-slide" data-full="assets/images/4,05.s3.jpeg" style="background-image:url('assets/images/4,05.s3.jpeg')"></div>
+                    <div class="carousel-slide" data-full="assets/images/4,06.s3.jpeg" style="background-image:url('assets/images/4,06.s3.jpeg')"></div>
+                    <div class="carousel-slide" data-full="assets/images/4,07.s3.jpeg" style="background-image:url('assets/images/4,07.s3.jpeg')"></div>
+                    <div class="carousel-slide" data-full="assets/images/4,08.s3.jpeg" style="background-image:url('assets/images/4,08.s3.jpeg')"></div>
+                    <div class="carousel-slide" data-full="assets/images/4,09.s3.jpeg" style="background-image:url('assets/images/4,09.s3.jpeg')"></div>
+                    <div class="carousel-slide" data-full="assets/images/4,10.s3.jpeg" style="background-image:url('assets/images/4,10.s3.jpeg')"></div>
+                    <div class="carousel-indicator">1/10</div>
+                  </div>
+                </div>
+
+                <div class="gallery-item portrait-9-16" data-index="31" data-type="image" data-full="assets/images/5.s3.png">
+                  <div style="background-image:url('assets/images/5.s3.png');background-size:cover;background-position:center;width:100%;height:100%"></div>
+                </div>
+
+                <div class="gallery-item portrait-9-16" data-index="32" data-type="image" data-full="assets/images/6.s3.jpeg">
+                  <div style="background-image:url('assets/images/6.s3.jpeg');background-size:cover;background-position:center;width:100%;height:100%"></div>
+                </div>
+
+                <div class="gallery-item portrait-9-16" data-index="33" data-type="video" data-video="assets/video/7.s3.mp4" data-full="assets/images/7.s3.png">
+                  <div style="background-image:url('assets/images/7.s3.png');background-size:cover;background-position:center;width:100%;height:100%;position:relative"><div class="video-play-icon"></div></div>
+                </div>
+
+                <div class="gallery-item portrait-9-16" data-index="34" data-type="video" data-video="assets/video/8.s3.mp4" data-full="assets/images/8.s3.png">
+                  <div style="background-image:url('assets/images/8.s3.png');background-size:cover;background-position:center;width:100%;height:100%;position:relative"><div class="video-play-icon"></div></div>
+                </div>
+
+              </div>
+
+              <div class="modal-overlay" id="modal3">
+                <button class="modal-close" id="modalClose3">×</button>
+                <button class="modal-nav prev" id="modalPrev3">‹</button>
+                <button class="modal-nav next" id="modalNext3">›</button>
+                <div class="modal-content" id="modalContent3"></div>
+                <div class="modal-counter" id="modalCounter3"></div>
+              </div>
+
+          </div>
+        </section>
+      `;
+    }
+
+    function initCarousels() {
+      clearAllCarouselIntervals();
+      document.querySelectorAll('[data-type="carousel"]').forEach((item, idx) => {
+        const container = item.querySelector('.carousel-container');
+        if (!container) return;
+        const slides = Array.from(container.querySelectorAll('.carousel-slide'));
+        if (!slides.length) return;
+        const indicator = container.querySelector('.carousel-indicator');
+        const ds = parseInt(item.dataset.carouselSize, 10);
+        const carouselSize = Number.isFinite(ds) && ds > 0 ? ds : slides.length;
+        let currentSlide = slides.findIndex(s => s.classList.contains('active'));
+        if (currentSlide === -1) currentSlide = 0;
+        slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+        if (indicator) indicator.textContent = `${currentSlide + 1}/${carouselSize}`;
+        const key = item.dataset.index !== undefined ? item.dataset.index : ('ci_' + idx);
+        if (carouselIntervals[key]) { try { clearInterval(carouselIntervals[key]); } catch (e) {} }
+        const intervalTime = carouselSize <= 3 ? 7000 : carouselSize <= 6 ? 6000 : 5000;
+        const intervalId = setInterval(() => {
+          const currentSlides = Array.from(container.querySelectorAll('.carousel-slide'));
+          if (!currentSlides.length) return;
+          let activeIndex = currentSlides.findIndex(s => s.classList.contains('active'));
+          if (activeIndex === -1) activeIndex = 0;
+          currentSlides[activeIndex].classList.remove('active');
+          let next = (activeIndex + 1) % carouselSize;
+          if (next >= currentSlides.length) next = 0;
+          currentSlides[next].classList.add('active');
+          if (indicator) indicator.textContent = `${next + 1}/${carouselSize}`;
+        }, intervalTime);
+        carouselIntervals[key] = intervalId;
+      });
+    }
+
+    function attachGalleryHandlers() {
+      document.querySelectorAll('.gallery-item').forEach(item => {
+        const newItem = item.cloneNode(true);
+        item.parentNode.replaceChild(newItem, item);
+      });
+      document.querySelectorAll('.gallery-item').forEach((item) => {
+        item.addEventListener('click', () => {
+          const gallery = item.closest('#gallery1, #gallery2, #gallery3');
+          if (!gallery) return;
+          const itemsInGallery = Array.from(gallery.querySelectorAll('.gallery-item'));
+          const indexInGallery = itemsInGallery.indexOf(item);
+          if (indexInGallery === -1) return;
+          openModal(gallery.id, indexInGallery);
+        });
+      });
+      const close1 = document.getElementById('modalClose1'); if (close1) close1.onclick = () => closeModal('modal1');
+      const close2 = document.getElementById('modalClose2'); if (close2) close2.onclick = () => closeModal('modal2');
+      const close3 = document.getElementById('modalClose3'); if (close3) close3.onclick = () => closeModal('modal3');
+      if (!window.__keyboardNavAttached) {
+        document.addEventListener('keydown', (e) => {
+          const activeModal = document.querySelector('.modal-overlay.active');
+          if (!activeModal) return;
+          if (e.key === 'Escape') closeModal(activeModal.id);
+          if (e.key === 'ArrowLeft') navigateModal(activeModal.id, -1);
+          if (e.key === 'ArrowRight') navigateModal(activeModal.id, 1);
+        });
+        window.__keyboardNavAttached = true;
+      }
+    }
+
+    function openModal(galleryId, index) {
+      currentGalleryId = galleryId;
+      currentModalIndex = index;
+      const modalId = galleryId.replace('gallery', 'modal');
+      const modal = document.getElementById(modalId);
+      const gallery = document.getElementById(galleryId);
+      if (!modal || !gallery) return;
+      galleryItems = Array.from(gallery.querySelectorAll('.gallery-item'));
+      if (currentModalIndex < 0 || currentModalIndex >= galleryItems.length) currentModalIndex = 0;
+      modal.classList.add('active');
+      updateModalContent();
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (!modal) return;
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+      const video = modal.querySelector('video');
+      if (video) { video.pause(); video.currentTime = 0; }
+    }
+
+    function navigateModal(modalId, direction) {
+      if (!galleryItems || !galleryItems.length) return;
+      currentModalIndex = (currentModalIndex + direction + galleryItems.length) % galleryItems.length;
+      updateModalContent();
+    }
+
+    function updateModalContent() {
+      if (!galleryItems || !galleryItems.length) return;
+      const item = galleryItems[currentModalIndex];
+      if (!item) return;
+      const modalId = currentGalleryId.replace('gallery', 'modal');
+      const modalContentId = modalId.replace('modal', 'modalContent');
+      const modalCounterId = modalId.replace('modal', 'modalCounter');
+      const modalContent = document.getElementById(modalContentId);
+      const modalCounter = document.getElementById(modalCounterId);
+      const modalEl = document.getElementById(modalId);
+      if (!modalContent || !modalCounter || !modalEl) return;
+      modalCounter.textContent = `${currentModalIndex + 1} / ${galleryItems.length}`;
+      const type = item.dataset.type || 'image';
+      if (type === 'video') {
+        const poster = item.dataset.full || '';
+        const videoSrc = item.dataset.video || '';
+        if (videoSrc) {
+          modalContent.innerHTML = `
+            <video class="modal-video" controls autoplay ${poster ? `poster="${poster}"` : ''} style="max-width:95vw;max-height:90vh;">
+              <source src="${videoSrc}" type="video/mp4">
+              Seu navegador não suporta vídeo.
+            </video>
+          `;
+        } else {
+          modalContent.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;max-width:95vw;max-height:95vh;"><img class="modal-image" src="${poster}" alt="Poster do vídeo" /></div>`;
+        }
+        const prevBtn = modalEl.querySelector('.modal-nav.prev');
+        const nextBtn = modalEl.querySelector('.modal-nav.next');
+        if (prevBtn) prevBtn.onclick = () => navigateModal(modalId, -1);
+        if (nextBtn) nextBtn.onclick = () => navigateModal(modalId, 1);
+      } else if (type === 'carousel') {
+        const slides = Array.from(item.querySelectorAll('.carousel-slide'));
+        const ds = parseInt(item.dataset.carouselSize, 10);
+        const carouselSize = Number.isFinite(ds) && ds > 0 ? ds : (slides.length || 1);
+        let carouselIndex = Math.max(0, slides.findIndex(s => s.classList.contains('active')));
+        if (carouselIndex === -1) carouselIndex = 0;
+        const slideEl = slides[carouselIndex] || slides[0];
+        const fullSrc = getFullSrcFromItem(item, slideEl) || '';
+        modalContent.innerHTML = `
+          <div style="display:flex;align-items:center;justify-content:center;max-width:95vw;max-height:95vh;">
+            <img id="modalImg" class="modal-image" src="${fullSrc}" alt="Imagem ampliada" />
+          </div>
+        `;
+        let modalCarouselIndex = carouselIndex;
+        function navigateCarousel(dir) {
+          modalCarouselIndex = (modalCarouselIndex + dir + carouselSize) % carouselSize;
+          const nextSlide = slides[modalCarouselIndex] || slides[0];
+          const src = getFullSrcFromItem(item, nextSlide) || '';
+          const img = document.getElementById('modalImg');
+          if (img) img.src = src;
+          const counter = document.getElementById(modalCounterId);
+          if (counter) counter.textContent = `${currentModalIndex + 1} / ${galleryItems.length} — ${modalCarouselIndex + 1}/${carouselSize}`;
+        }
+        const prevBtn = modalEl.querySelector('.modal-nav.prev');
+        const nextBtn = modalEl.querySelector('.modal-nav.next');
+        if (prevBtn) prevBtn.onclick = () => navigateCarousel(-1);
+        if (nextBtn) nextBtn.onclick = () => navigateCarousel(1);
+      } else {
+        const fullSrc = getFullSrcFromItem(item) || '';
+        modalContent.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;max-width:95vw;max-height:95vh;"><img class="modal-image" src="${fullSrc}" alt="Imagem ampliada" /></div>`;
+        const prevBtn = modalEl.querySelector('.modal-nav.prev');
+        const nextBtn = modalEl.querySelector('.modal-nav.next');
+        if (prevBtn) prevBtn.onclick = () => navigateModal(modalId, -1);
+        if (nextBtn) nextBtn.onclick = () => navigateModal(modalId, 1);
+      }
+    }
+
+    (function init() {
+      if (window.elementSdk && typeof window.elementSdk.init === 'function') {
+        try {
+          window.elementSdk.init({
+            defaultConfig,
+            onConfigChange: async (config) => {
+              await onConfigChange(config);
+              setTimeout(() => { attachGalleryHandlers(); initCarousels(); }, 100);
+            },
+            mapToCapabilities: () => ({}),
+            mapToEditPanelValues: () => new Map()
+          });
+        } catch (e) {
+          onConfigChange(defaultConfig).then(() => { attachGalleryHandlers(); initCarousels(); });
+        }
+      } else {
+        onConfigChange(defaultConfig).then(() => { attachGalleryHandlers(); initCarousels(); });
+      }
+    })();
+  </script>
+</body>
+</html>
